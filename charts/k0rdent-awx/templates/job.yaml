@@ -1,0 +1,99 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "k0rdent-awx.fullname" . }}
+  labels:
+    {{- include "k0rdent-awx.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: {{ .Values.backoffLimit }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "k0rdent-awx.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "k0rdent-awx.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: CONTROLLER_HOST
+              value: {{ .Values.awxServiceUrl}}
+            - name: CONTROLLER_USERNAME
+              value: admin
+            - name: CONTROLLER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.awxAdminPasswordSecretName }}
+                  key: {{ .Values.awxAdminPasswordSecretKey }}
+          command:
+            - /tmp/run.sh
+          volumeMounts:
+            - name: pod-tmp
+              mountPath: /tmp
+            - name: awx-config
+              mountPath: /tmp/run.sh
+              subPath: run.sh
+              readOnly: true
+            - name: awx-config
+              mountPath: /tmp/requirements.yml
+              subPath: requirements.yml
+              readOnly: true
+            - name: awx-config
+              mountPath: /tmp/awx-config-vars.yaml
+              subPath: awx-config-vars.yaml
+              readOnly: true
+            - name: ssh-key
+              mountPath: /var/run/secrets/id_rsa
+              subPath: id_rsa
+              readOnly: true
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: pod-tmp
+          emptyDir: {}
+        - name: awx-config
+          configMap:
+            name: {{ include "k0rdent-awx.fullname" . }}-config
+            defaultMode: 504
+        - name: ssh-key
+          secret:
+            secretName: {{ required "awxConfig.sshKeySecretName is required" .Values.awxConfig.sshKeySecretName }}
+            defaultMode: 416
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: Never
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -35,10 +35,13 @@ Common labels
 */}}
 {{- define "k0rdent-awx.labels" -}}
 helm.sh/chart: {{ include "k0rdent-awx.chart" . }}
-{{ include "k0rdent-awx.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
+app: {{ include "k0rdent-awx.name" . }}
+app.kubernetes.io/name: {{ include "k0rdent-awx.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: "k0rdent-awx"
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 

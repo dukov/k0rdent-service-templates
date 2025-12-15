@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "k0rdent-awx.fullname" . }}-config
+data:
+  run.sh: |
+    #!/bin/bash
+    ansible-galaxy install -r /tmp/requirements.yml
+    ansible-playbook -e "@/tmp/awx-config-vars.yaml" k0rdent.core.awx_config $DEBUG
+  requirements.yml: |
+    collections:
+      - name: {{ .Values.awxConfig.collectionGitUrl }}
+        type: git
+        version: {{ .Values.awxConfig.collectionGitVersion }}
+    {{- with .Values.awxConfig.extraCollections }}
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  awx-config-vars.yaml: |
+    targets: localhost
+    awx_credentials:
+      - name: "Machine Credential"
+        ssh_key_path: "/var/run/secrets/id_rsa"
+    {{- with .Values.awxConfig.awxProjects }}
+    awx_projects:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.awxConfig.awxInventories }}
+    awx_inventories:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.awxConfig.awxInstanceGroups }}
+    awx_instance_groups:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.awxConfig.awxOrganizations }}
+    awx_organizations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}

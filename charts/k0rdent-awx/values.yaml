@@ -2,34 +2,62 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+backoffLimit: 4
+
+awxServiceUrl: http://awx-service
+awxAdminPasswordSecretName: awx-admin-password
+awxAdminPasswordSecretKey: password
+
+awxConfig:
+  collectionGitUrl: https://github.com/dukov/ansible-collections-k0rdent.git
+  collectionGitVersion: main
+  # sshKeySecretName: ansible-ssh-key
+  awxOrganizations: []
+    # - name: "Default"
+    #   description: "K0rdent Organization"
+  awxProjects: []
+    # - name: "k0rdent"
+    #   scm_url: "https://github.com/dukov/k0redent-ansible-test"
+    #   organization: "Default"
+  awxInventories: []
+    # - name: "k0rdent"
+    #   organization: "Default"
+    #   inventory_sources:
+    #     - name: "k0rdent"
+    #       source_project: "k0rdent"
+    #       source_path: "k0rdent_nodes.yaml"
+  awxInstanceGroups: []
+    # - name: "default"
+    #   pod_spec_override:
+    #     spec:
+    #       serviceAccountName: awx-inventory-reader
+    #       automountServiceAccountToken: true
+  extraCollections: []
 
 image:
-  repository: nginx
+  repository: quay.io/ansible/awx-ee
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "24.6.1"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
   # Automatically mount a ServiceAccount's API credentials?
   automount: true
   # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
 
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext: 
+  fsGroup: 0
+  fsGroupChangePolicy: OnRootMismatch
+  runAsGroup: 0
+  runAsUser: 0
 
 securityContext: {}
   # capabilities:
@@ -38,26 +66,6 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -71,21 +79,6 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-livenessProbe:
-  httpGet:
-    path: /
-    port: http
-readinessProbe:
-  httpGet:
-    path: /
-    port: http
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
 volumes: []
