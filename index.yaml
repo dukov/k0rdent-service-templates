@@ -3,6 +3,16 @@ entries:
   k0rdent-awx:
   - apiVersion: v2
     appVersion: 24.6.1
+    created: "2025-12-15T13:45:31.731336191Z"
+    description: A Helm chart for Kubernetes
+    digest: 98346199b72b067c28d5c1c9ae168361c1df092ee873389d41661932248f7335
+    name: k0rdent-awx
+    type: application
+    urls:
+    - https://github.com/dukov/k0rdent-service-templates/releases/download/k0rdent-awx-0.1.1/k0rdent-awx-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 24.6.1
     created: "2025-12-15T12:31:56.35629457Z"
     description: A Helm chart for Kubernetes
     digest: 9c56b1e4a6694b9a21ea3dbdb84ab8c689b5aaa0673be10c5e2b196689c48cb1
@@ -11,4 +21,4 @@ entries:
     urls:
     - https://github.com/dukov/k0rdent-service-templates/releases/download/k0rdent-awx-0.1.0/k0rdent-awx-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-15T12:31:56.35630001Z"
+generated: "2025-12-15T13:45:31.731343465Z"
