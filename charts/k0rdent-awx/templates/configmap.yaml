@@ -37,3 +37,7 @@ data:
     awx_organizations:
       {{- toYaml . | nindent 6 }}
     {{- end }}
+    {{- with .Values.awxConfig.awxJobTemplates }}
+    awx_job_templates:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}

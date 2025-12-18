@@ -32,6 +32,18 @@ awxConfig:
     #     spec:
     #       serviceAccountName: awx-inventory-reader
     #       automountServiceAccountToken: true
+  awxJobTemplates: []
+    # - name: "Production"
+    #   job_type: "run"
+    #   inventory: "k0rdent"
+    #   project: "k0rdent"
+    #   playbook: "production.yml"
+    #   credentials:
+    #     - "Machine Credential"
+    #   schedules:
+    #     - name: "Enforce State"
+    #       rrule: "DTSTART:20240101T000000Z RRULE:FREQ=HOURLY;INTERVAL=1"
+    #       enabled: true
   extraCollections: []
 
 image:
